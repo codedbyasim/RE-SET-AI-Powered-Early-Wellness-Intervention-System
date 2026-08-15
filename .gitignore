@@ -1,0 +1,58 @@
+# Environments and Secrets
+.env
+.env.*
+*.env
+backend/.env
+backend/.env.*
+frontend/.env.local
+frontend/.env.production
+!.env.example
+!backend/.env.example
+!frontend/.env.production.example
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+.venv/
+venv/
+env/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+logs/
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vercel/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Deploy artifacts
+.vercel/
+.render/
+.pytest_cache/
+backend/__pycache__/

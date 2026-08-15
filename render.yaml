@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: reset-wellness-api
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        value: postgresql://postgres.nwlypyjuxqfhzpymiytd:3SM49hyFv%3F%2BC%23FL@aws-0-ap-northeast-1.pooler.supabase.com:6543/postgres
+      - key: AIML_API_KEY
+        value: cb3d6e4d523dc160267fc08c631e210e
+      - key: AIML_API_BASE_URL
+        value: https://api.aimlapi.com/v1
+      - key: AIML_MODEL
+        value: gpt-4o-mini
+      - key: FRONTEND_URL
+        value: https://reset-wellness.vercel.app,http://localhost:5173
+      - key: ALLOW_ALL_ORIGINS
+        value: "false"
+    plan: free
+    healthCheckPath: /health
