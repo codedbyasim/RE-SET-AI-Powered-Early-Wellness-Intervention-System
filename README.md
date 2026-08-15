@@ -11,7 +11,7 @@
 [![Database](https://img.shields.io/badge/Database-Supabase%20PostgreSQL-3ecf8e?style=for-the-badge&logo=supabase)](https://supabase.com)
 [![AI Engine](https://img.shields.io/badge/AI%20Pipeline-6--Agent%20Cooperative%20LLM-f59e0b?style=for-the-badge&logo=openai)](https://aimlapi.com)
 
-[🚀 Live Demo](#-quickstart--local-testing) • [🏛️ System Architecture](#-system-architecture) • [🤖 6-Agent AI Pipeline](#-the-6-agent-cooperative-ai-pipeline) • [📊 Mathematical Formulation](#-mathematical-formulation--readiness-index) • [🔒 Privacy & Safety](#-security-privacy--ethical-guardrails) • [📖 Deployment Guide](DEPLOYMENT.md)
+[🚀 Live Demo](#-quickstart--local-testing) • [🏛️ System Architecture](#-system-architecture) • [🤖 6-Agent AI Pipeline](#-the-6-agent-cooperative-ai-pipeline) • [📱 UI Showcase](#-user-interface-showcase) • [📊 Mathematical Formulation](#-mathematical-formulation--readiness-index) • [🔒 Privacy & Safety](#-security-privacy--ethical-guardrails) • [📖 Deployment Guide](DEPLOYMENT.md)
 
 </div>
 
@@ -34,61 +34,9 @@ University students often do not recognize acute burnout until exam failure, chr
 
 RE:SET is engineered as a decoupled, asynchronous multi-tier platform built with **FastAPI**, **React (TypeScript)**, **Supabase PostgreSQL**, and the **AIML API (GPT-4o-mini)**.
 
-```mermaid
-graph TB
-    subgraph Client["🖥️ CLIENT LAYER (React 18 + Vite + Tailwind CSS)"]
-        UI_AUTH["🔐 Auth & JWT Storage<br/>(Full-Page Responsive)"]
-        UI_CHECKIN["📝 Daily Check-In<br/>(Live SVG Readiness Gauge)"]
-        UI_RESET["⏱️ Today's RESET<br/>(Circular Timer + Action Cards)"]
-        UI_INSIGHTS["📈 Weekly Analytics<br/>(Dual Bar Chart + Deltas)"]
-        UI_WHAT["🔍 'What Changed?' Diagnostic<br/>(Baseline Deviation Modal)"]
-        UI_CAMPUS["🏫 Campus Mode<br/>(k-Anonymity Dashboard)"]
-        UI_SAFETY["🚨 Crisis Modal<br/>(24/7 Helpline Routing)"]
-    end
-
-    subgraph API["⚡ BACKEND API LAYER (FastAPI + Python 3.11)"]
-        AUTH_ROUTER["/api/v1/auth<br/>(JWT Token & Bcrypt)"]
-        CHECKIN_ROUTER["/api/v1/checkins<br/>(Signals & Ingestion)"]
-        RESET_ROUTER["/api/v1/interventions<br/>(Plan Generation & Completion)"]
-        INSIGHTS_ROUTER["/api/v1/insights<br/>(Trend Deltas & Analytics)"]
-        CAMPUS_ROUTER["/api/v1/campus<br/>(k >= 20 Aggregation)"]
-        PRIVACY_ROUTER["/api/v1/privacy<br/>(GDPR Export & Hard Delete)"]
-        ORCHESTRATOR["🎯 Multi-Agent Orchestrator<br/>(Pipeline Coordinator)"]
-    end
-
-    subgraph Agents["🤖 6-AGENT COOPERATIVE AI PIPELINE (AIML API - GPT-4o-mini)"]
-        A_SAFETY["🛡️ 1. Safety Agent<br/>(Crisis Screen & Helpline Override)"]
-        A_PATTERN["📈 2. Pattern Agent<br/>(3d/7d Statistical Delta Extraction)"]
-        A_RISK["⚠️ 3. Risk / Trend Agent<br/>(State: Stable | Attention | Recovery)"]
-        A_PERSON["🎯 4. Personalization Agent<br/>(Targeted Recovery Mapping)"]
-        A_INTERV["⚡ 5. Intervention Agent<br/>(3-4 Timed Actions + Prompt)"]
-        A_REFLECT["🔄 6. Reflection Agent<br/>(Next-Day Correlation Analysis)"]
-        A_DIAG["🔍 7. 'What Changed?' Agent<br/>(Signature Baseline Diagnostics)"]
-    end
-
-    subgraph Storage["🗄️ PERSISTENCE LAYER (Supabase PostgreSQL)"]
-        DB_USERS[("Users & Profiles")]
-        DB_CHECKINS[("Daily Check-Ins")]
-        DB_SIGNALS[("Computed Signals")]
-        DB_PATTERNS[("Pattern Records")]
-        DB_PLANS[("Intervention Plans")]
-        DB_RESULTS[("Action Completions")]
-        DB_CAMPUS[("Aggregated Cohorts")]
-    end
-
-    %% Flow Connections
-    Client -->|REST API Requests + Bearer JWT| API
-    API --> ORCHESTRATOR
-    ORCHESTRATOR --> A_SAFETY
-    A_SAFETY -->|If Safe| A_PATTERN
-    A_SAFETY -->|If Crisis Detected| UI_SAFETY
-    A_PATTERN --> A_RISK
-    A_RISK --> A_PERSON
-    A_PERSON --> A_INTERV
-    A_INTERV --> A_REFLECT
-    API --> Storage
-    Agents -->|Structured JSON Output| ORCHESTRATOR
-```
+<div align="center">
+  <img src="docs/images/system_architecture.png" alt="RE:SET System Architecture Diagram" width="950" />
+</div>
 
 ---
 
@@ -96,41 +44,9 @@ graph TB
 
 Instead of a generic single-prompt chatbot, RE:SET passes state deterministically through a sequential chain of specialized micro-agents:
 
-```mermaid
-sequenceDiagram
-    autonumber
-    actor User as 🎓 Student
-    participant API as ⚡ FastAPI Ingestion
-    participant Safety as 🛡️ Agent 1: Safety Agent
-    participant Pattern as 📈 Agent 2: Pattern Agent
-    participant Risk as ⚠️ Agent 3: Risk / Trend Agent
-    participant Person as 🎯 Agent 4: Personalization Agent
-    participant Interv as ⚡ Agent 5: Intervention Agent
-    participant DB as 🗄️ Supabase PostgreSQL
-
-    User->>API: Submits Daily Signals (Sleep, Stress, Mood, Energy, Screen Time, Note)
-    API->>Safety: Evaluate free_text_note for acute distress / self-harm
-    
-    alt Crisis Detected (High-Recall Keyword & LLM Filter)
-        Safety-->>API: Crisis Flag = TRUE + Emergency Helplines
-        API-->>User: Suppress AI recommendations & Display 24/7 Crisis Modal (988, Umang, Rozan)
-    else Safe Signal Stream
-        API->>Pattern: Compute rolling 3-day & 7-day statistical deltas
-        Pattern-->>API: Structured Deltas & Non-clinical Pattern Summary
-        
-        API->>Risk: Evaluate multi-signal deviation
-        Risk-->>API: State: STABLE | NEEDS_ATTENTION | RECOVERY_NEEDED
-        
-        API->>Person: Correlate user constraints, history & strained vectors
-        Person-->>API: Target Category (Cognitive | Somatic | Sensory | Circadian)
-        
-        API->>Interv: Synthesize 3-4 concrete micro-actions + closing reflection prompt
-        Interv-->>API: Today's RESET Plan (JSON)
-        
-        API->>DB: Persist Check-In, Computed Pattern, and RESET Plan
-        API-->>User: Return Live Readiness Index + Today's RESET Plan
-    end
-```
+<div align="center">
+  <img src="docs/images/ai_pipeline_workflow.png" alt="6-Agent Cooperative AI Pipeline Flowchart" width="950" />
+</div>
 
 ### Agent Roster & Responsibilities
 
@@ -143,6 +59,26 @@ sequenceDiagram
 | **5** | **Intervention Agent** | Generates 3–4 timed actionable micro-steps | Target domain + user context | Complete **RESET Plan** with timer durations & icons |
 | **6** | **Reflection Agent** | Compares next-day check-in to observe recovery correlation | $T$ and $T+1$ signal deltas | Effectiveness adaptation score |
 | **7** | **"What Changed?" Agent** | Diagnoses primary lifestyle factor causing current state | 7-day window vs personal baseline | Ranked contributing factors & plain-language summary |
+
+---
+
+## 📱 User Interface Showcase
+
+<div align="center">
+
+### 1. Split-Screen Auth & Onboarding
+<img src="docs/images/ui_auth.png" alt="RE:SET Authentication Interface" width="900" />
+
+### 2. Daily Check-In & Live Readiness Gauge
+<img src="docs/images/ui_checkin.png" alt="RE:SET Daily Check-In" width="900" />
+
+### 3. Today's RESET Micro-Recovery Plan (with Circular Timer)
+<img src="docs/images/ui_reset_plan.png" alt="Today's RESET Plan" width="900" />
+
+### 4. Weekly Analytics & Signal Deltas
+<img src="docs/images/ui_insights.png" alt="Weekly Analytics Dashboard" width="900" />
+
+</div>
 
 ---
 
@@ -176,16 +112,9 @@ When $\Delta_{\text{stress}} > +30\%$ and $\Delta_{\text{sleep}} < -20\%$, the R
 
 ## 🔒 Security, Privacy & Ethical Guardrails
 
-```mermaid
-graph LR
-    subgraph PrivacyControls["🛡️ DATA PRIVACY & COMPLIANCE"]
-        P1["🚫 Zero Sensors<br/>No mic, camera, GPS, or biometrics accessed"]
-        P2["🔐 JWT + Bcrypt<br/>Industry standard password hashing"]
-        P3["🏫 k-Anonymity (N ≥ 20)<br/>Campus aggregate hides individuals"]
-        P4["📥 GDPR Portability<br/>1-Click complete JSON data export"]
-        P5["🗑️ Right to be Forgotten<br/>Instant cascade hard deletion"]
-    end
-```
+<div align="center">
+  <img src="docs/images/privacy_security_flow.png" alt="Privacy & Safety Guardrails" width="950" />
+</div>
 
 - **Non-Diagnostic Policy**: RE:SET explicitly states on all pages that it is a *lifestyle and behavioral habit support tool*, not a clinical or medical diagnostic device.
 - **k-Anonymity ($N \ge 20$)**: Institutional Campus Mode only displays aggregate student metrics when a minimum cohort size of 20 students from that university participate.
