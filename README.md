@@ -82,31 +82,101 @@ Instead of a generic single-prompt chatbot, RE:SET passes state deterministicall
 
 ---
 
-## 📊 Mathematical Formulation & Readiness Index
+## 📊 Mathematical Formulation & Analytical Architecture
 
-RE:SET evaluates student physiological readiness via the **Recovery Readiness Composite Index (RRCI)**:
+The RE:SET analytical engine uses deterministic mathematical models to evaluate physiological readiness, detect early behavioral drift, and isolate primary stressors.
 
-$$\text{RRCI} = 0.25 \cdot S_{\text{sleep}} + 0.25 \cdot S_{\text{stress}} + 0.20 \cdot S_{\text{energy}} + 0.15 \cdot S_{\text{activity}} + 0.15 \cdot S_{\text{digital}}$$
+---
 
-### Component Normalization Functions
+### 1. Recovery Readiness Composite Index ($\text{RRCI}$)
 
-1. **Sleep Quality Score ($S_{\text{sleep}}$)**:
-   $$S_{\text{sleep}} = \min\left(100, \frac{\text{sleep\_hours}}{8.0} \times 100\right)$$
+The primary daily indicator is calculated as a convex linear combination of five normalized dimensional sub-scores:
 
-2. **Stress Inversion Score ($S_{\text{stress}}$)**:
-   $$S_{\text{stress}} = (11 - \text{stress\_level}) \times 10, \quad \text{where } \text{stress} \in [1, 10]$$
+$$\text{RRCI}(t) = w_{\text{sleep}} S_{\text{sleep}}(t) + w_{\text{stress}} S_{\text{stress}}(t) + w_{\text{energy}} S_{\text{energy}}(t) + w_{\text{activity}} S_{\text{activity}}(t) + w_{\text{digital}} S_{\text{digital}}(t)$$
 
-3. **Physical Energy Score ($S_{\text{energy}}$)**:
-   $$S_{\text{energy}} = \begin{cases} 90, & \text{energy} = \text{"high"} \\ 60, & \text{energy} = \text{"medium"} \\ 30, & \text{energy} = \text{"low"} \end{cases}$$
+$$\text{where} \quad \sum_{i=1}^{5} w_i = 1.0, \quad \mathbf{w} = \begin{bmatrix} w_{\text{sleep}} \\ w_{\text{stress}} \\ w_{\text{energy}} \\ w_{\text{activity}} \\ w_{\text{digital}} \end{bmatrix} = \begin{bmatrix} 0.25 \\ 0.25 \\ 0.20 \\ 0.15 \\ 0.15 \end{bmatrix}$$
 
-4. **Digital Balance Score ($S_{\text{digital}}$)**:
-   $$S_{\text{digital}} = \begin{cases} 90, & \text{screen\_time} \le 3.0\text{h} \\ 65, & 3.0\text{h} < \text{screen\_time} \le 6.0\text{h} \\ 35, & \text{screen\_time} > 6.0\text{h} \end{cases}$$
+---
 
-### Rolling Baseline Anomaly Detection ($\Delta$)
+### 2. Dimensional Sub-Score Normalization Models
 
-$$\Delta_{\text{signal}} = \frac{\bar{X}_{3\text{d}} - \bar{X}_{7\text{d\_baseline}}}{\bar{X}_{7\text{d\_baseline}}} \times 100\%$$
+Each biological and behavioral input is mapped to a bounded interval $[0, 100]$ via validated physiological curves:
 
-When $\Delta_{\text{stress}} > +30\%$ and $\Delta_{\text{sleep}} < -20\%$, the Risk Agent triggers an immediate `RECOVERY_NEEDED` state.
+#### A. Piecewise Continuous Sleep Quality Score ($S_{\text{sleep}}$)
+Optimal student restorative sleep is parameterized between **7.5 and 9.0 hours**, with penalties for acute deprivation ($< 7.5\text{h}$) and excessive hypersomnia ($> 9.0\text{h}$):
+
+$$S_{\text{sleep}}(h) = \begin{cases} 10.0, & h \le 0 \\ \max\left(10.0, \; \frac{h}{7.5} \times 95.0\right), & 0 < h < 7.5 \\ 95.0, & 7.5 \le h \le 9.0 \\ \max\left(50.0, \; 95.0 - (h - 9.0) \times 15.0\right), & h > 9.0 \end{cases}$$
+
+#### B. Inverted Linear Stress Score ($S_{\text{stress}}$)
+Self-reported perceived psychological strain $\sigma \in [1, 10]$ is linearly inverted and bounded:
+
+$$S_{\text{stress}}(\sigma) = \max\left(10.0, \; (11 - \sigma) \times 10.0\right)$$
+
+#### C. Physical Energy Discrete Quantization ($S_{\text{energy}}$)
+Qualitative somatic vitality state $e \in \{\text{Low}, \text{Medium}, \text{High}\}$ maps to discrete baseline indices:
+
+$$S_{\text{energy}}(e) = \begin{cases} 90.0, & e = \text{"High"} \\ 65.0, & e \in \{\text{"Medium"}, \text{"Moderate"}\} \\ 35.0, & e = \text{"Low"} \end{cases}$$
+
+#### D. Non-Linear Digital Exposure Penalty ($S_{\text{digital}}$)
+Screen exposure duration $\tau$ in hours is penalized according to cognitive fatigue thresholds:
+
+$$S_{\text{digital}}(\tau) = \begin{cases} 90.0, & \tau \le 3.5\text{h} \quad (\text{Optimal}) \\ 70.0, & 3.5\text{h} < \tau \le 6.0\text{h} \quad (\text{Moderate}) \\ 45.0, & 6.0\text{h} < \tau \le 8.5\text{h} \quad (\text{Elevated}) \\ 25.0, & \tau > 8.5\text{h} \quad (\text{Excessive / High Strain}) \end{cases}$$
+
+#### E. Estimated Activity & Somatic Balance ($S_{\text{activity}}$)
+Synthesizes energy capacity and stress relief reserve into an estimated somatic index:
+
+$$S_{\text{activity}} = \min\left(95.0, \; \max\left(20.0, \; 0.70 \cdot S_{\text{energy}} + 3.0 \cdot (11 - \sigma)\right)\right)$$
+
+---
+
+### 3. Multi-Horizon Rolling Anomaly Detection ($\Delta_{\text{signal}}$)
+
+To differentiate temporary bad days from structural lifestyle deterioration, the engine computes normalized percentage deviations between recent moving averages ($\bar{X}_{\text{recent}}$, past 1–3 days) and the student's personal rolling baseline ($\bar{X}_{\text{baseline}}$, preceding 7–14 days):
+
+$$\Delta_{\text{signal}}(t) = \left(\frac{\bar{X}_{\text{recent}} - \bar{X}_{\text{baseline}}}{\left|\bar{X}_{\text{baseline}}\right|}\right) \times 100\%$$
+
+```
+   ┌────────────────────────────────────────────────────────┐
+   │ Baseline Window (7 - 14 Days)  │ Recent (1 - 3 Days)  │
+───┴────────────────────────────────┴───────────────────────┴──► Time (t)
+               X̄_baseline                      X̄_recent
+```
+
+---
+
+### 4. Tri-State Wellness Decision Boundary ($\mathcal{S}$)
+
+The Risk & Trend Agent applies deterministic multi-variable boundary logic to partition user state:
+
+$$\mathcal{S}(t) = \begin{cases} 
+\mathbf{RECOVERY\_NEEDED}, & \text{if } \sigma(t) \ge 8 \;\lor\; h(t) \le 5.0\text{h} \;\lor\; \big(\Delta_{\text{stress}} \ge +30\% \land \Delta_{\text{sleep}} \le -20\%\big) \\ 
+\mathbf{NEEDS\_ATTENTION}, & \text{if } \sigma(t) \ge 6 \;\lor\; h(t) \le 6.5\text{h} \;\lor\; \Delta_{\text{stress}} \ge +15\% \;\lor\; \Delta_{\text{sleep}} \le -10\% \\ 
+\mathbf{STABLE}, & \text{otherwise} 
+\end{cases}$$
+
+---
+
+### 5. "What Changed?" Diagnostic Attribution Matrix
+
+When diagnosing lifestyle divergence, each signal's contributing impact weight $I_j$ is evaluated:
+
+$$I_j = \left|\Delta_j\right| \times \alpha_j, \quad \text{where } \boldsymbol{\alpha} = \begin{bmatrix} \alpha_{\text{sleep}} \\ \alpha_{\text{stress}} \\ \alpha_{\text{energy}} \\ \alpha_{\text{screen}} \end{bmatrix} = \begin{bmatrix} 1.8 \\ 1.6 \\ 1.3 \\ 1.1 \end{bmatrix}$$
+
+$$\text{Primary Root Driver} = \arg\max_{j} I_j$$
+
+This isolates whether acute sleep debt, elevated stress spikes, or digital fatigue is the leading contributor to current fatigue.
+
+---
+
+### 6. Analytical Parameters Summary
+
+| Vector | Variable | Weight ($w_i$) | Ideal Target | Impact Multiplier ($\alpha_i$) | Clinical Rationale |
+|---|---|---|---|---|---|
+| **Sleep Duration** | $h$ (hours) | **25%** | 7.5 – 9.0 hrs | **1.8** | Memory consolidation & prefrontal recovery |
+| **Stress Level** | $\sigma$ (1–10) | **25%** | 1 – 3 | **1.6** | Cortisol regulation & autonomic balance |
+| **Physical Energy** | $e$ (Categorical) | **20%** | High (90) | **1.3** | Somatic readiness & fatigue resistance |
+| **Digital Balance** | $\tau$ (hours) | **15%** | $\le$ 3.5 hrs | **1.1** | Circadian rhythm & blue light mitigation |
+| **Somatic Activity** | $a$ (Composite) | **15%** | $\ge$ 75.0 | **1.0** | Endorphin regulation & tension release |
 
 ---
 
