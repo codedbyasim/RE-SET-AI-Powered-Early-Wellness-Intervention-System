@@ -9,9 +9,9 @@ services:
       - key: SECRET_KEY
         generateValue: true
       - key: DATABASE_URL
-        value: postgresql://postgres.nwlypyjuxqfhzpymiytd:3SM49hyFv%3F%2BC%23FL@aws-0-ap-northeast-1.pooler.supabase.com:6543/postgres
+        sync: false
       - key: AIML_API_KEY
-        value: cb3d6e4d523dc160267fc08c631e210e
+        sync: false
       - key: AIML_API_BASE_URL
         value: https://api.aimlapi.com/v1
       - key: AIML_MODEL
