@@ -19,6 +19,6 @@ services:
       - key: FRONTEND_URL
         value: https://reset-wellness.vercel.app,http://localhost:5173
       - key: ALLOW_ALL_ORIGINS
-        value: "false"
+        value: "true"
     plan: free
     healthCheckPath: /health

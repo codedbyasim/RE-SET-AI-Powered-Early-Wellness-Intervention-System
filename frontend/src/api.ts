@@ -9,7 +9,8 @@ import {
 
 // In production (Vercel), VITE_API_URL = "https://your-backend.onrender.com"
 // In local dev, falls back to /api/v1 (proxied by Vite to localhost:8000)
-const API_BASE = (import.meta.env.VITE_API_URL ?? '') + '/api/v1';
+const rawBase = (import.meta.env.VITE_API_URL || '').trim().replace(/\/+$/, '');
+const API_BASE = rawBase ? `${rawBase}/api/v1` : '/api/v1';
 
 
 export function getAuthToken(): string | null {
@@ -36,14 +37,20 @@ function getHeaders(): HeadersInit {
 }
 
 export async function loginUser(email: string, password: string): Promise<any> {
-  const res = await fetch(`${API_BASE}/auth/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password })
-  });
+  let res: Response;
+  try {
+    res = await fetch(`${API_BASE}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+  } catch (err: any) {
+    throw new Error(`Unable to connect to server. If Render backend was sleeping, please wait a few seconds and try again.`);
+  }
+
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err.detail || 'Login failed');
+    throw new Error(err.detail || 'Login failed. Please verify your email and password.');
   }
   const data = await res.json();
   if (data.access_token) {
@@ -53,14 +60,20 @@ export async function loginUser(email: string, password: string): Promise<any> {
 }
 
 export async function registerUser(email: string, password: string, full_name: string, university_name: string): Promise<any> {
-  const res = await fetch(`${API_BASE}/auth/register`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password, full_name, university_name })
-  });
+  let res: Response;
+  try {
+    res = await fetch(`${API_BASE}/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password, full_name, university_name })
+    });
+  } catch (err: any) {
+    throw new Error(`Unable to connect to server. If Render backend was sleeping, please wait a few seconds and try again.`);
+  }
+
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err.detail || 'Registration failed');
+    throw new Error(err.detail || 'Registration failed. Please try again.');
   }
   const data = await res.json();
   if (data.access_token) {
@@ -70,9 +83,14 @@ export async function registerUser(email: string, password: string, full_name: s
 }
 
 export async function fetchCurrentUser(): Promise<UserProfile> {
-  const res = await fetch(`${API_BASE}/auth/me`, {
-    headers: getHeaders()
-  });
+  let res: Response;
+  try {
+    res = await fetch(`${API_BASE}/auth/me`, {
+      headers: getHeaders()
+    });
+  } catch (err: any) {
+    throw new Error(`Network error while fetching profile.`);
+  }
   if (!res.ok) throw new Error('Failed to fetch profile');
   return res.json();
 }

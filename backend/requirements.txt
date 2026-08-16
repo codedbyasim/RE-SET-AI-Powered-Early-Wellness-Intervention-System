@@ -9,7 +9,6 @@ psycopg2-binary
 pandas
 numpy
 python-jose[cryptography]
-passlib[bcrypt]
 bcrypt
 python-multipart
 requests

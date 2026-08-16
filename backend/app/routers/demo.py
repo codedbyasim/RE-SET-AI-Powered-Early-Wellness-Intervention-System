@@ -90,8 +90,7 @@ def load_sarah_scenario(
         screen_delta_pct=+55.0,
         wellness_state="RECOVERY_NEEDED",
         dominant_signals=json.dumps(["Sleep duration drop (-35%)", "Late-night screen usage (+55%)"]),
-        summary_text="Sharp sleep deficit coupled with heightened exam workload over the past 3 days.",
-        language="en"
+        summary_text="Sharp sleep deficit coupled with heightened exam workload over the past 3 days."
     )
     db.add(pattern)
     db.commit()
@@ -110,7 +109,6 @@ def load_sarah_scenario(
             {"id": 3, "title": "4-7-8 Parasympathetic Breathing", "duration_mins": 8, "icon": "wind", "description": "Completed 6 deliberate breath cycles in dim light.", "is_done": True}
         ]),
         reflection_prompt="What is one study task you can comfortably delegate to tomorrow?",
-        language="en",
         is_completed=True,
         completed_at=datetime.datetime.utcnow() - datetime.timedelta(days=1)
     )
@@ -144,7 +142,6 @@ def load_sarah_scenario(
             {"id": 3, "title": "Open-Air Horizon Gazing", "duration_mins": 8, "icon": "sun", "description": "Step to the balcony and take 10 slow breaths.", "is_done": False}
         ]),
         reflection_prompt="What gave you the most sense of relief today?",
-        language="en",
         is_completed=False
     )
     db.add(int_today)
