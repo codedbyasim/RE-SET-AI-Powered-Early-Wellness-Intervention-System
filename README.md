@@ -4,6 +4,7 @@
 
 ### _Detecting subtle student routine deterioration & delivering personalized micro-recovery before acute burnout._
 
+[![YouTube Demo](https://img.shields.io/badge/Demo%20Video-YouTube-red?style=for-the-badge&logo=youtube)](https://youtu.be/ZLfqNWrWeMg)
 [![Hackathon](https://img.shields.io/badge/CS%20Girlies%20Hackathon-Technology%20For%20Wellness-10b981?style=for-the-badge&logo=target)](https://cs-girlies-wellness-hackathon.devpost.com/)
 [![Track](<https://img.shields.io/badge/Track-Health%20(Advanced)%20%2B%20Best%20Use%20of%20AI-6366f1?style=for-the-badge>)](https://devpost.com/)
 [![FastAPI](https://img.shields.io/badge/Backend-FastAPI%20%7C%20Python%203.11-009688?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com)
@@ -12,6 +13,14 @@
 [![AI Engine](https://img.shields.io/badge/AI%20Pipeline-6--Agent%20Cooperative%20LLM-f59e0b?style=for-the-badge&logo=openai)](https://aimlapi.com)
 
 </div>
+
+---
+
+## 🎬 Video Demonstration
+
+[![Watch RE:SET Demo Video](https://img.shields.io/badge/▶️%20Watch%20Project%20Walkthrough-YouTube%20Video-red?style=for-the-badge&logo=youtube)](https://youtu.be/ZLfqNWrWeMg)
+
+> 📺 **Watch the complete project demo and pitch on YouTube:** [https://youtu.be/ZLfqNWrWeMg](https://youtu.be/ZLfqNWrWeMg)
 
 ---
 
@@ -205,6 +214,7 @@ npm run dev
 - **Hackathon**: [CS Girlies Annual Hackathon: Technology For Wellness](https://cs-girlies-wellness-hackathon.devpost.com/)
 - **Primary Track**: **Health (Advanced Track)**
 - **Bonus Track**: **Best Use of AI** (Multi-agent structured reasoning with safety guardrails)
+- **Demo Video**: [YouTube Walkthrough](https://youtu.be/ZLfqNWrWeMg)
 - **Repository**: [GitHub Repository](https://github.com/codedbyasim/RE-SET-AI-Powered-Early-Wellness-Intervention-System)
 
 ---
