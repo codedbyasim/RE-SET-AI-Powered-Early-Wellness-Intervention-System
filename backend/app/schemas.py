@@ -7,7 +7,7 @@ class UserBase(BaseModel):
     email: EmailStr
     full_name: Optional[str] = "Student"
     role: Optional[str] = "student"
-    university_name: Optional[str] = "National University"
+    university_name: Optional[str] = "NUTECH University"
     campus_opt_in: Optional[bool] = True
 
 class UserCreate(UserBase):

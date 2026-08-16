@@ -42,8 +42,13 @@ def get_today_intervention(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
+    """Return the intervention created today (linked to today's check-in), or null."""
+    today = datetime.date.today()
+
     intervention = db.query(Intervention).filter(
-        Intervention.user_id == current_user.id
+        Intervention.user_id == current_user.id,
+        Intervention.created_at >= datetime.datetime.combine(today, datetime.time.min),
+        Intervention.created_at <= datetime.datetime.combine(today, datetime.time.max)
     ).order_by(Intervention.created_at.desc()).first()
 
     if not intervention:

@@ -231,7 +231,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onAuthSuccess }) => {
                         required
                         value={university}
                         onChange={e => setUniversity(e.target.value)}
-                        placeholder="e.g. FAST National University"
+                        placeholder="e.g. NUTECH University"
                         className="form-input pl-10"
                       />
                     </div>

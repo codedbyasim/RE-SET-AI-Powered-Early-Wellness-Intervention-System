@@ -13,7 +13,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuc
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
-  const [university, setUniversity] = useState('National University');
+  const [university, setUniversity] = useState('NUTECH University');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -125,7 +125,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuc
                     required
                     value={university}
                     onChange={(e) => setUniversity(e.target.value)}
-                    placeholder="e.g. National University"
+                    placeholder="e.g. NUTECH University"
                     className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-100 text-sm focus:outline-none focus:border-emerald-400 transition"
                   />
                 </div>

@@ -55,6 +55,7 @@ def get_weekly_insights(
     daily_points = []
     total_sleep = 0
     total_stress = 0
+    total_mood = 0
 
     for c in checkins:
         day_name = c.checkin_date.strftime("%a")
@@ -69,37 +70,70 @@ def get_weekly_insights(
         ))
         total_sleep += c.sleep_hours
         total_stress += c.stress
+        total_mood += c.mood
 
+    n = len(checkins)
     latest = checkins[-1]
-    latest_readiness = calculate_readiness_score(latest.sleep_hours, latest.stress, latest.energy, latest.screen_time_hours or 4.0)
+    latest_readiness = calculate_readiness_score(
+        latest.sleep_hours, latest.stress, latest.energy, latest.screen_time_hours or 4.0
+    )
 
-    latest_pattern = db.query(Pattern).filter(Pattern.user_id == current_user.id).order_by(Pattern.created_at.desc()).first()
+    latest_pattern = db.query(Pattern).filter(
+        Pattern.user_id == current_user.id
+    ).order_by(Pattern.created_at.desc()).first()
     state = latest_pattern.wellness_state if latest_pattern else "STABLE"
     summary_text = latest_pattern.summary_text if latest_pattern else "Patterns steady."
 
-    avg_sleep = round(total_sleep / len(checkins), 1)
-    avg_stress = round(total_stress / len(checkins), 1)
-    
-    ai_takeaway = f"Over the past {len(checkins)} days, your average sleep was {avg_sleep}h with a mean stress score of {avg_stress}/10."
-    
+    avg_sleep = round(total_sleep / n, 1)
+    avg_stress = round(total_stress / n, 1)
+    avg_mood = round(total_mood / n, 1)
+
+    # Determine trend direction
+    if n >= 3:
+        first_half_stress = sum(c.stress for c in checkins[:n//2]) / (n//2)
+        second_half_stress = sum(c.stress for c in checkins[n//2:]) / (n - n//2)
+        stress_trend_dir = "rising" if second_half_stress > first_half_stress + 0.5 else \
+                           "falling" if second_half_stress < first_half_stress - 0.5 else "stable"
+        first_half_sleep = sum(c.sleep_hours for c in checkins[:n//2]) / (n//2)
+        second_half_sleep = sum(c.sleep_hours for c in checkins[n//2:]) / (n - n//2)
+        sleep_trend_dir = "improving" if second_half_sleep > first_half_sleep + 0.3 else \
+                          "declining" if second_half_sleep < first_half_sleep - 0.3 else "consistent"
+    else:
+        stress_trend_dir = "stable"
+        sleep_trend_dir = "consistent"
+
+    ai_takeaway = (
+        f"Over {n} days, your average sleep was {avg_sleep}h "
+        f"with a mean stress of {avg_stress}/10 (mood: {avg_mood}/5)."
+    )
+
     try:
         client = get_client()
-        prompt = f"""Generate a single, insightful weekly synthesis sentence in English for a student's wellness dashboard.
-Stats:
-- Average Sleep: {avg_sleep} hours/night
-- Average Stress: {avg_stress}/10
-- Total Check-ins: {len(checkins)}
-- State: {state}
+        prompt = f"""You are a wellness coach AI. Write one concise, personal, actionable insight sentence for a student.
 
-Example style: "Your lowest stress days consistently followed nights with more than 7.5 hours of sleep."
-Respond in 1 sentence only in English. No medical terms."""
+Student's last {n} days at NUTECH University:
+- Average Sleep: {avg_sleep} hours/night (trend: {sleep_trend_dir})
+- Average Stress: {avg_stress}/10 (trend: {stress_trend_dir})
+- Average Mood: {avg_mood}/5
+- Current State: {state}
+- Latest Readiness Score: {latest_readiness['overall_score']}/100
+
+Rules:
+- Be specific and personal, reference their actual numbers
+- Give one actionable suggestion
+- Max 2 sentences
+- No medical terms, no diagnoses
+- Sound like a caring coach, not a robot
+
+Example output: "Your stress peaked on exam days but dropped by 30% when you slept over 7 hours — tonight, prioritize an 8-hour window to maintain this recovery momentum."
+"""
         res = client.chat.completions.create(
             model=settings.AIML_MODEL,
             messages=[{"role": "user", "content": prompt}],
-            max_tokens=60,
-            temperature=0.3
+            max_tokens=100,
+            temperature=0.5
         )
-        ai_takeaway = res.choices[0].message.content.strip()
+        ai_takeaway = res.choices[0].message.content.strip().strip('"')
     except Exception as e:
         logger.error(f"Weekly Takeaway LLM error: {e}")
 

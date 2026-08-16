@@ -13,7 +13,7 @@ class User(Base):
     hashed_password = Column(String, nullable=False)
     full_name = Column(String, default="Student")
     role = Column(String, default="student")  # student, university_admin, system_admin
-    university_name = Column(String, default="National University")
+    university_name = Column(String, default="NUTECH University")
     campus_opt_in = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
@@ -119,7 +119,7 @@ class CampusAggregate(Base):
     __tablename__ = "campus_aggregates"
 
     id = Column(Integer, primary_key=True, index=True)
-    institution_name = Column(String, default="National University", index=True)
+    institution_name = Column(String, default="NUTECH University", index=True)
     date_window = Column(String, default="Current Term")
     total_students = Column(Integer, default=45)
     avg_wellbeing_pct = Column(Float, default=72.0)

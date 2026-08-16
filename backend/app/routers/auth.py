@@ -39,21 +39,11 @@ def create_access_token(data: dict, expires_delta: Optional[datetime.timedelta] 
 
 def get_current_user(token: Optional[str] = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> User:
     if not token:
-        # Check if any user exists or create default initial user
-        first_user = db.query(User).first()
-        if not first_user:
-            first_user = User(
-                email="student@university.edu",
-                hashed_password=get_password_hash("password123"),
-                full_name="Alex Student",
-                role="student",
-                university_name="National University",
-                campus_opt_in=True
-            )
-            db.add(first_user)
-            db.commit()
-            db.refresh(first_user)
-        return first_user
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Not authenticated. Please log in.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -87,7 +77,7 @@ def register(user_in: UserCreate, db: Session = Depends(get_db)):
         hashed_password=get_password_hash(user_in.password),
         full_name=user_in.full_name or "Student",
         role=user_in.role or "student",
-        university_name=user_in.university_name or "National University",
+        university_name=user_in.university_name or "NUTECH University",
         campus_opt_in=user_in.campus_opt_in if user_in.campus_opt_in is not None else True
     )
     db.add(user)
